@@ -49,16 +49,15 @@ SP500_symbol =['AIV', 'AMAT', 'ADM', 'AIZ', 'T', 'ADSK',
                'AAPL', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AAP', 'AES', 'AET', 'AFL',
                'AMG', 'ARE', 'APD', 'AA', 'AGN', 'ALXN', 'ALLE', 'ADS', 'ALL',
                'MO', 'AMZN', 'AEE', 'AAL', 'AEP', 'AXP', 'AIG', 'AMT', 'AMP', 'ABC', 'AME',
-               'AMGN', 'APH', 'APC', 'ADI', 'AON', 'APA', 'AIV', 'AMAT', 'ADM', 'AIZ', 'T', 'ADSK',
-               'ADP', 'AN', 'AZO', 'AVGO', 'AVB', 'AVY', 'BLL', 'BAC', 'BK',
-               'BAX', 'BBT', 'BDX', 'BBBY', 'BBY', 'BLX', 'HRB', 'BA', 'BWA', 'BXP', 'BSX',
-               'BMY', 'BF.B', 'CHRW', 'CA', 'COG', 'CPB', 'COF', 'CAH', 'CSCO', 'GOOGL', 'GOOG', 'HSIC', 'HP', 'MU',
-               'MSFT', 'MLNX', 'WYN', 'WYNN', 'XEL', 'XRX', 'XLNX', 'QCOM', 'IBM', 'CERN', 'INTC', '^GSPC'
-               ]
+               'AMGN', 'APH', 'APC', 'ADI', 'AON', 'APA']
+
 start_date = [2007,5,24]
 end_date = [2017,5,24]
 csv_sp500_path = './csv_files_sp500'
-for symbol in SP500_symbol:
+import time
+for symbol in SP500_symbol:    
+    print("going to sleep for 2 sec...")
+    time.sleep(2)
     print("generate csv to symbol ",symbol,"...")
     data=Fetcher(symbol, start_date, end_date)
     try:
