@@ -6,108 +6,113 @@ import scipy
 import SPFG as SP
 
 class Agent:
-    #def __init__(self ,stockToPredict=stk.Stock(),correlatedStock = stk.Stock()):
-    def __init__(self, stockToPredict, correlatedStock,mode = 'SinLag_SinCC'):
+    def __init__(self, stockToPredict, correlatedStock,mode):
         self.stockToPredict = stockToPredict
         self.correlatedStock = correlatedStock
         self.mode = mode
         self.lag = 0
-        
-    def vote(self,binary_correlation = True,agentMode='SinLag_SinCC',correlationLength=401,PVMode=False):
 
-        y_tags = self.correlatedStock.get_tags_history('Close',length=correlationLength)
-#        ccCloseVal , lagClose  = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
-#                                                                             binary_correlation=binary_correlation,
-#                                                                             correlationLength=correlationLength)
+    def voteMuLagSinCC(self,binary_correlation,correlationLength):
+        ccCloseVal, lagClose = SP.get_correlation_and_lag(self.stockToPredict, self.correlatedStock,
+                                                          binary_correlation=binary_correlation,
+                                                          correlationLength=correlationLength)
+        if lagClose <=0:
+            Y_LagClose, ccCloseVal, lagClose = 0,0,0
+        else:
+            y_tags = self.correlatedStock.get_tags_history('Close', length=correlationLength)
+            windowS = max(0, lagClose - 1)
+            windowE = lagClose+2
+            Y_LagClose = np.argmax(np.bincount(y_tags[windowS:windowE]))
+        return Y_LagClose, ccCloseVal, lagClose
+
+    def voteSinLagSinCC(self,binary_correlation,correlationLength):
         ccCloseVal, lagClose = SP.get_correlation_and_lag(self.stockToPredict,self.correlatedStock,
                                                                            binary_correlation=binary_correlation,
                                                                            correlationLength=correlationLength)
+        if lagClose <=0:
+            Y_LagClose, ccCloseVal, lagClose = 0,0,0
+        else:
+            Y_LagClose = self.correlatedStock.get_tags_history('Close', length=correlationLength)[lagClose - 1]
+        return Y_LagClose,ccCloseVal,lagClose
 
+    def voteSinLagMuCC(self,binary_correlation,correlationLength):
+        y_tags = self.correlatedStock.get_tags_history('Close', length=correlationLength)
+        ccCloseVal, lagClose = SP.get_correlation_and_lag(self.stockToPredict, self.correlatedStock,
+                                                          binary_correlation=binary_correlation,
+                                                          correlationLength=correlationLength)
+        ccVolumeVal, lagVolume = SP.get_correlation_and_lag(self.stockToPredict, self.correlatedStock,
+                                                            signal='Volume',
+                                                            binary_correlation=False,
+                                                            correlationLength=correlationLength)
+        ccMAVal, lagMA = SP.get_correlation_and_lag(self.stockToPredict, self.correlatedStock,
+                                                    signal='MA',
+                                                    binary_correlation=False,
+                                                    correlationLength=correlationLength)
+        ccOpenVSPrevCloseVal, lagOpenVSPrevClose = SP.get_correlation_and_lag(self.stockToPredict, self.correlatedStock,
+                                                                              signal='OpenVSPrevClose',
+                                                                              binary_correlation=False,
+                                                                              correlationLength=correlationLength)
 
-        if agentMode == 'SinLag_MuCC':
-            ccVolumeVal, lagVolume = SP.get_correlation_and_lag(self.stockToPredict,self.correlatedStock,
-                                                                               signal='Volume',
+        ccPercentageChangeVal, lagPercentageChange = SP.get_correlation_and_lag(self.stockToPredict,
+                                                                                self.correlatedStock,
+                                                                                signal='PercentageChange',
                                                                                 binary_correlation=False,
-                                                                                 correlationLength=correlationLength)
-            ccMAVal, lagMA = SP.get_correlation_and_lag(self.stockToPredict,self.correlatedStock,
-                                                                                 signal='MA',
-                                                                                 binary_correlation=False,
-                                                                                 correlationLength=correlationLength)
+                                                                                correlationLength=correlationLength)
+        ## financial signals may be used in the furure ##
+        # ccGCRVal, lagGCR = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
+        #                                                             signal='GCR',
+        #                                                             binary_correlation=False,
+        #                                                             correlationLength=correlationLength)
+        # ccDCRVal, lagDCR = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
+        #                                                               signal='DCR',
+        #                                                              binary_correlation=False,
+        #                                                              correlationLength=correlationLength)
+        # ccRSIVal, lagRSI = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
+        #                                                               signal='RSI',
+        #                                                               binary_correlation=False,
+        #                                                               correlationLength=correlationLength)
 
-            #ccGCRVal, lagGCR = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
-            #                                                             signal='GCR',
-            #                                                             binary_correlation=False,
-            #                                                             correlationLength=correlationLength)
-            #ccDCRVal, lagDCR = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
-            #                                                               signal='DCR',
-            #                                                              binary_correlation=False,
-            #                                                              correlationLength=correlationLength)
-            #ccRSIVal, lagRSI = self.stockToPredict.get_correlation_and_lag(self.correlatedStock,
-            #                                                               signal='RSI',
-            #                                                               binary_correlation=False,
-            #                                                               correlationLength=correlationLength)
+        lags = [lagClose, lagVolume, lagMA, lagOpenVSPrevClose, lagPercentageChange]
+        CCs = [ccCloseVal, ccVolumeVal, ccMAVal, ccOpenVSPrevCloseVal,
+               ccPercentageChangeVal]
 
-            ccOpenVSPrevCloseVal, lagOpenVSPrevClose = SP.get_correlation_and_lag(self.stockToPredict,self.correlatedStock,
-                                                                                                   signal='OpenVSPrevClose',
-                                                                                                   binary_correlation=False,
-                                                                                                   correlationLength=correlationLength)
+        PLbls = ['Close', 'Volume', 'MA', 'OvsC', '%change']
 
-            ccPercentageChangeVal, lagPercentageChange = SP.get_correlation_and_lag(self.stockToPredict,self.correlatedStock,
-                                                                           signal='PercentageChange',
-                                                                           binary_correlation=False,
-                                                                           correlationLength=correlationLength)
+        validLagsIndices = [i for i in range(0, lags.__len__()) if lags[i] > 0]
+        validLags        = [lags[i] for i in validLagsIndices]
+        validCCs         = [CCs[i] for i in validLagsIndices]
+        validPLbls       = [PLbls[i] for i in validLagsIndices]
 
-            lags = [lagClose,lagVolume,lagMA,lagOpenVSPrevClose,lagPercentageChange]
-            CCs  = [ccCloseVal,ccVolumeVal, ccMAVal, ccOpenVSPrevCloseVal,
-                                ccPercentageChangeVal]
-
-
-            #lags = [lagClose, lagVolume, lagMA]
-            #CCs = [ccCloseVal, ccVolumeVal, ccMAVal]
-            PLbls = ['Close', 'Volume', 'MA','OvsC','%change']
-            #PLbls = ['Close','Volume','MA']
-
-            validLagsIndices = [i for i in range(0,lags.__len__()) if lags[i]>0]
-            validLags  = [lags[i] for i in validLagsIndices]
-            validCCs   = [CCs[i] for i in validLagsIndices]
-            validPLbls = [PLbls[i] for i in validLagsIndices]
-            #print("validCCs = ", validCCs)
-            #print("validPLbls = ", validPLbls)
-            if validCCs.__len__()<1:
-                return 0,0,0
+        if validCCs.__len__() < 1:
+            Y_Lag, cc, lag,PLbl = 0, 0, 0, 0
+        else:
             maxCC  = max(validCCs)
             maxIdx = validCCs.index(maxCC)
             lag    = validLags[maxIdx]
             cc     = validCCs[maxIdx]
             PLbl   = validPLbls[maxIdx]
-            Y_Lag = y_tags[lag - 1]
-            self.lag = lag
-            if PVMode == True:
-                Y_Lag = Y_Lag * cc
-            return Y_Lag,cc,PLbl
+            Y_Lag  = y_tags[lag - 1]
 
-        if lagClose <= 0:
-            Y_LagClose,ccCloseVal = 0,0
-            return Y_LagClose,ccCloseVal
+        return Y_Lag, cc, lag,PLbl
+
+
+    def vote(self,binary_correlation = True,agentMode='SinLag_SinCC',correlationLength=401,PVMode=False):
+        lag,cc,PLbl = 0,0,0  # PLbl relevant only for agentMode = SinLag_MuCC
+
+        if agentMode == 'SinLag_SinCC':
+            Y_Lag,cc,lag  = self.voteSinLagSinCC(binary_correlation=binary_correlation,correlationLength=correlationLength)
+
+        elif agentMode == 'SinLag_MuCC':
+            Y_Lag,cc,lag,PLbl = self.voteSinLagMuCC(binary_correlation=binary_correlation, correlationLength=correlationLength)
 
         elif agentMode == 'MuLag_SinCC':
-            windowS = max(0, lagClose - 2)
-            windowE = lagClose + 1
-            Y_LagClose = np.argmax(np.bincount(y_tags[windowS:windowE]))
-            #print("Inside agent vote")
-            #print("agentMode = ", agentMode)
-            #print("y_tags[windowS:windowE] = ", y_tags[windowS:windowE])
-            #print("Y_LagClose = ", Y_LagClose)
-            if Y_LagClose > 1:
-                print("stop")
-        elif agentMode == 'SinLag_SinCC':
-            Y_LagClose = y_tags[lagClose - 1]
+            Y_Lag, cc, lag = self.voteMuLagSinCC(binary_correlation=binary_correlation,correlationLength=correlationLength)
 
+        if lag <= 0:
+            Y_Lag,cc = 0,0
 
-
-        self.lag = lagClose
+        self.lag = lag
         if PVMode == True:
-            Y_LagClose = Y_LagClose*ccCloseVal
-        if Y_LagClose > 1:
-            print("stop")
-        return Y_LagClose ,ccCloseVal
+            Y_Lag = Y_Lag*cc
+
+        return Y_Lag, cc, PLbl

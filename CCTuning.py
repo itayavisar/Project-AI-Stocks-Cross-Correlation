@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import stocksDatabase as DB
 import stock as stk
 import numpy as np
-from scipy import signal
-
 
 from sys import argv
 import SPFG as SP
@@ -19,7 +17,7 @@ if argv.__len__() > 2:
     else:
         binary_correlation = False
 else:
-    binary_correlation = False # default
+    binary_correlation = True # default
 
 cur_symbol = DB.csv_path+'\\AAPL_10lag.csv'
 corr_symbol = DB.csv_path+'\\AAPL.csv'

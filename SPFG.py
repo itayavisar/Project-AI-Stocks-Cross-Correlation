@@ -9,7 +9,7 @@ def normalize(signal):
     return ret_signal
 
 
-def get_correlation_and_lag(curStk, corStk, correlationLength=401, binary_correlation=True, signal='Close'):
+def get_correlation_and_lag(curStk, corStk, correlationLength, binary_correlation=True, signal='Close'):
     if signal == 'Close':
         signalA = curStk.Close
         signalV = corStk.Close
@@ -35,15 +35,16 @@ def get_correlation_and_lag(curStk, corStk, correlationLength=401, binary_correl
         signalA = curStk.getPercentageChange()
         signalV = corStk.getPercentageChange()
 
-    a = normalize(signalA[0:correlationLength])
-    v = normalize(signalV[0:correlationLength])
-
     if binary_correlation:
-        binA = curStk.get_tags_history(signal, length=correlationLength)
-        binV = corStk.get_tags_history(signal, length=correlationLength)
+        binA = curStk.get_tags_history(signal, length=correlationLength)[0:correlationLength]
+        binV = corStk.get_tags_history(signal, length=correlationLength)[0:correlationLength]
+        #if binA.__len__() != binV.__len__():
+        #    print("Itay stop")
         cc = np.correlate(binA, binV, mode='same')
         cc = np.asarray(cc) / (np.linalg.norm(binA) * np.linalg.norm(binV))
     else:
+        a = normalize(signalA[0:correlationLength])
+        v = normalize(signalV[0:correlationLength])
         cc = np.correlate(a, v, mode='same')
         if max(cc) != 0:
             cc = np.asarray(cc) / (np.linalg.norm(a) * np.linalg.norm(v))
@@ -51,3 +52,4 @@ def get_correlation_and_lag(curStk, corStk, correlationLength=401, binary_correl
     lag = (round(cc.__len__() / 2) - np.argmax(cc))
     maxCC = max(cc)
     return maxCC, lag
+

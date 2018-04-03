@@ -16,6 +16,7 @@ def build(length,correlation_length=400,base = 10):
             corStk = stk.Stock()
             corStk.init_from_symbol(corSymbol, base=base)
             #correlation,lag = curStk.get_correlation_and_lag(corStk,correlationLength= correlation_length)
+            print("Inside build: correlation length = ",correlation_length)
             correlation, lag = SP.get_correlation_and_lag(curStk,corStk, correlationLength=correlation_length)
             table[curStk.name.split('\\')[1]][corStk.name.split('\\')[1]] = ["{0:.2f}".format(correlation),
                                                                              lag]
@@ -50,6 +51,6 @@ def build(length,correlation_length=400,base = 10):
 
 print("build start:")
 #'./csv_files_sp500\\AAPL.csv'
-build(20)
+build(400,correlation_length=401)
 
 print("build end")

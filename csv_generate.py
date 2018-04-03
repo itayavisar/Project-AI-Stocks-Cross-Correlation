@@ -50,15 +50,13 @@ SP500_symbol =['AIV', 'AMAT', 'ADM', 'AIZ', 'T', 'ADSK',
                'AMG', 'ARE', 'APD', 'AA', 'AGN', 'ALXN', 'ALLE', 'ADS', 'ALL',
                'MO', 'AMZN', 'AEE', 'AAL', 'AEP', 'AXP', 'AIG', 'AMT', 'AMP', 'ABC', 'AME',
                'AMGN', 'APH', 'APC', 'ADI', 'AON', 'APA']
-
 start_date = [2007,5,24]
 end_date = [2017,5,24]
 csv_sp500_path = './csv_files_sp500'
 import time
-for symbol in SP500_symbol:    
-    print("going to sleep for 2 sec...")
-    time.sleep(2)
+for symbol in SP500_symbol:
     print("generate csv to symbol ",symbol,"...")
+    time.sleep(2)
     data=Fetcher(symbol, start_date, end_date)
     try:
         with open(csv_sp500_path+'/'+symbol+'.csv','w') as csvfile:
