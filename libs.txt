@@ -1,9 +1,0 @@
-#########################
-### Required Packages ###
-#########################
-1) download yahoo-historical package in this address https://pypi.python.org/pypi/yahoo-historical/0.1.3
-
-2) package keras with tensorflow backend:
-    run:
-    pip install tensorflow
-    $ python -m pip install --upgrade https://storage.googleapis.com/tensorflow-0.12.0-py3-none-any.whl
