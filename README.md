@@ -2,20 +2,20 @@
 This Project is about to predict the directional movements of a stock, using cross-correltion with other stocks
 
 ################################################################################
-Description
+#Description
 ################################################################################
 
 Our code implement a system for stock's directional movements prediction, using Cross-Correlation between other stocks. The system is configurable by various parameters.
 
 ################################################################################
-Objective
+#Objective
 ################################################################################ 
 
 The Project Objective was to predict the daily directional movement of a stock. The Data we used of the historical data for each stock for a given window of time.
 The historical data contains the stocks' Close,Open,High,Low prices and the Volume of the stocks. 
 
 ################################################################################
-Pre-Condition
+#Pre-Condition
 ################################################################################
 
 CSV files of the historical data with headers of No.,Date,Open,High,Low,Close,Adj Close, Volume. 
@@ -24,14 +24,14 @@ The rows are ordered by chronological timeline from past to present as the rows 
 All CSV files, should be located in path '.\csv_files_sp500'
 
 ################################################################################
-Generatin CSVs data
+#Generatin CSVs data
 ################################################################################ 
 
 After creating the directory '.\csv_files_sp500', edit in file csv_generate.py the requested stocks for csv generation by editing the list variable SP500_symbol.
 This script generate from the list all the requested CSVs for the Database in path '.\csv_files_sp500'.
 
 ################################################################################
-Running the Code
+#Running the Code
 ################################################################################
 
 config:
@@ -63,14 +63,13 @@ where <symbol> is the chosen symbol
 2) run main.py 
 
 ################################################################################
-Result
+#Result
 ################################################################################ We submitted our Ridge-Random Forest model to the Boston Data Week hackathon hosted at Hack/Reduce. Information about the competition is available at https://inclass.kaggle.com/c/boston-data-festival-hackathon
 
 During running the tests the results are printed to the console. At the end of the tests the results are plot by a scatter graph
 
 ################################################################################
-
-Files
+#Files
 ################################################################################ process.ipynb notebook Notebook describing our work and our main contributions
 
 sysConfig.py      - the configuration file which hold all the configurations for the system
